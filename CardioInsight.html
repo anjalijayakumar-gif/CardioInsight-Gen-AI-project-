@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>CardioInsight</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--teal:#18e3c8;--blue:#3b82ff;--ink:#eaf4ff;--mut:#8ea6c9;--rose:#ff5d7a;--amber:#ffb454;--card:rgba(16,38,82,.62);--line:rgba(120,190,255,.22)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#030814;overflow:hidden;font-family:"Segoe UI",Inter,system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center}
+.slide{position:absolute;inset:0;padding:52px 72px;opacity:0;pointer-events:none;transition:opacity .5s;overflow:hidden;background:radial-gradient(900px 600px at 80% 20%,#0d3a6b 0%,transparent 60%),radial-gradient(700px 500px at 5% 100%,#0a4a5a 0%,transparent 60%),linear-gradient(135deg,#050d22,#081a3c 60%,#06142e)}
+.slide.on{opacity:1;pointer-events:auto}
+.kick{color:var(--teal);font-size:15px;letter-spacing:.14em;font-weight:600}
+h1{font-size:100px;line-height:1;margin:18px 0 14px;letter-spacing:-3px;font-weight:800;background:linear-gradient(90deg,#fff,#7ff3e4 55%,#6aa5ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:40px;margin:6px 0 0;letter-spacing:-.5px;font-weight:700}
+.rel{position:relative;z-index:2}
+svg{display:block}
+.bgheart{position:absolute;right:30px;top:20px;width:650px;height:650px;z-index:1}
+.ecg{position:absolute;left:0;width:1280px;height:120px;z-index:1}
+/* slide 1 */
+.sub{font-size:28px;font-weight:600;max-width:760px;line-height:1.25}
+.line{font-size:19px;color:var(--mut);margin-top:16px;max-width:560px;line-height:1.45}
+.pres{margin-top:34px;display:inline-flex;align-items:center;gap:12px;padding:12px 22px;border-radius:40px;background:var(--card);border:1px solid var(--line);font-size:20px;font-weight:600}
+.pres small{color:var(--teal);font-weight:500;font-size:14px}
+.chips{position:absolute;left:72px;bottom:60px;display:flex;gap:12px;z-index:2}
+.chip{padding:9px 18px;border-radius:30px;border:1px solid var(--line);background:rgba(10,30,70,.7);font-size:15px;color:#cfe6ff}
+/* slide 2 */
+.pts{margin-top:26px;width:560px;display:flex;flex-direction:column;gap:14px}
+.pt{display:flex;gap:16px;align-items:center;padding:15px 18px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:18px;line-height:1.35}
+.pt i{flex:none;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--blue));display:grid;place-items:center;font-style:normal;font-size:19px}
+.vis2{position:absolute;right:56px;top:140px;z-index:2}
+.hl{position:absolute;left:72px;right:72px;bottom:46px;display:flex;align-items:center;justify-content:center;gap:18px;z-index:2}
+.hl span{padding:14px 30px;border-radius:40px;font-size:22px;font-weight:700;background:var(--card);border:1px solid var(--line)}
+.hl span:last-child{background:linear-gradient(90deg,var(--teal),var(--blue));color:#04122b;border:0}
+.hl b{color:var(--teal);font-size:26px}
+/* slide 3 */
+.s3 h2{text-align:center}
+.s3 .tag{text-align:center;color:var(--mut);margin-top:4px;font-size:16px}
+.fin{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:24px;font-weight:700;letter-spacing:.02em;z-index:2;color:var(--teal)}
+.diag{position:absolute;inset:0;z-index:2}
+/* slide 4 */
+.slide.s4{padding:34px 56px 0;color:#0f2a55;background:radial-gradient(700px 420px at 95% 0%,rgba(25,169,153,.16),transparent 70%),linear-gradient(160deg,#cde1f9 0%,#e3eefc 55%,#d2e6f6 100%)}
+.s4h{display:flex;align-items:baseline;gap:18px}
+.s4 h2{margin:0;font-size:38px;font-weight:700;color:#0f2a55;letter-spacing:-.5px}
+.s4h span{color:#3d5a88;font-size:16px}
+.dash{margin-top:14px;border-radius:12px;border:1px solid #b6cfee;background:#e6f0fc;box-shadow:0 12px 32px rgba(20,60,120,.18);overflow:hidden;position:relative;z-index:2}
+.bar{display:flex;align-items:center;gap:12px;height:46px;padding:0 20px;background:linear-gradient(90deg,#0f2a55,#16407a);color:#fff;font-size:17px;font-weight:600}
+.bar em{margin-left:auto;font-style:normal;font-size:13px;font-weight:500;color:#9be8dd;border:1px solid rgba(155,232,221,.5);padding:3px 10px;border-radius:5px}
+.grid{display:grid;grid-template-columns:270px 1fr 330px;gap:16px;padding:16px;height:480px}
+.card{background:#fff;border:1px solid #c9dcf3;border-radius:10px;padding:14px 18px;box-shadow:0 3px 10px rgba(20,60,120,.09);min-height:0}
+.card h4{margin:0 0 8px;padding-left:10px;border-left:4px solid #19a999;font-size:18px;color:#0f2a55;font-weight:700;line-height:1.2}
+.pf{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;border-bottom:1px solid #e3edf8;font-size:15px;color:#4a638f}
+.pf:last-child{border:0}.pf b{color:#0f2a55;font-weight:700;font-size:17px}.pf b.rk{color:#c8553a}
+.ctr{display:flex;flex-direction:column;align-items:center}.ctr h4{align-self:flex-start}
+.est{margin:2px 0 6px;padding:6px 18px;border-radius:6px;background:#eaf3fd;color:#0f2a55;font-size:17px}.est b{font-weight:800}
+.lg{display:flex;gap:16px;font-size:13px;color:#4a638f}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.rf{width:100%;margin-top:12px;padding-top:10px;border-top:1px solid #e3edf8}
+.rf h5{margin:0 0 8px;font-size:16px;font-weight:700;color:#0f2a55}
+.ib{display:grid;grid-template-columns:118px 1fr 128px;align-items:center;gap:10px;font-size:15px;margin-bottom:7px;color:#0f2a55}
+.ib .tr{height:12px;border-radius:3px;background:#e3edf8}.ib u{display:block;height:100%;border-radius:3px}
+.ib b{font-size:14px;font-weight:600}
+.sl{margin-bottom:10px;font-size:15px;color:#4a638f}.sl div{display:flex;justify-content:space-between}.sl b{color:#0f2a55;font-size:16px}
+input[type=range]{width:100%;accent-color:#2f7fd6;margin:6px 0 0}
+.cmp{border:1px solid #f3c3ac;background:#fdece4;border-radius:8px;padding:8px 14px}
+.cmp small{display:block;font-size:12px;font-weight:700;color:#4a638f;letter-spacing:.06em}
+.cmp .v{display:flex;align-items:baseline;gap:10px}.cmp strong{font-size:38px;font-weight:800;line-height:1.1}.cmp .v>span{font-size:17px;font-weight:700}
+.dn{text-align:center;color:#19a999;font-size:24px;font-weight:700;line-height:1.1;margin:2px 0}
+.note{font-size:12px;color:#4a638f;margin-top:8px}
+.fin4{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);padding:8px 28px;border-radius:20px;background:linear-gradient(90deg,#0f2a55,#1b5aa6);color:#fff;font-size:17px;font-weight:600;letter-spacing:.06em;z-index:2;white-space:nowrap}
+.fin4 b{color:#6ee3d3;font-weight:600}
+.nav{position:fixed;right:14px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:9}
+.nav button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(10,30,70,.8);color:#fff;font-size:18px;cursor:pointer}
+.nav button:focus-visible{outline:2px solid var(--teal)}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#18e3c8"/><stop offset="1" stop-color="#3b82ff"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18e3c8" stop-opacity=".25"/><stop offset="1" stop-color="#3b82ff" stop-opacity=".05"/></linearGradient>
+<radialGradient id="g3"><stop offset="0" stop-color="#14407a"/><stop offset="1" stop-color="#0a1e47"/></radialGradient>
+<marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#18e3c8"/></marker>
+</defs></svg>
+<div id="stage">
+
+<section class="slide s1 on">
+<svg class="bgheart" viewBox="0 0 100 100" data-op=".9"></svg>
+<svg class="ecg" viewBox="0 0 1280 120" style="bottom:90px;opacity:.55"></svg>
+<div class="rel" style="margin-top:96px">
+<div class="kick">IBM GENERATIVE AI · DATA SCIENCE WORKSHOP</div>
+<h1>CardioInsight</h1>
+<div class="sub">A Data-Driven Cardiovascular Risk Prediction System</div>
+<div class="line">Turning Health Data into Meaningful Cardiovascular Risk Insights</div>
+<div class="pres"><small>Presented by</small> Anjali Jayakumar</div>
+</div>
+<div class="chips"><span class="chip">Heart</span><span class="chip">Data</span><span class="chip">Technology</span><span class="chip">Prediction</span></div>
+</section>
+
+<section class="slide s2">
+<svg class="ecg" viewBox="0 0 1280 120" style="bottom:130px;opacity:.12"></svg>
+<div class="rel"><div class="kick">THE PROBLEM</div><h2>Beyond Prediction: Understanding Cardiovascular Risk</h2></div>
+<div class="pts rel">
+<div class="pt"><i>🧩</i><span>Risk is shaped by many factors: age, blood pressure, cholesterol, diabetes, obesity, smoking, inactivity</span></div>
+<div class="pt"><i>🎯</i><span>A risk score alone doesn't explain what is driving it</span></div>
+<div class="pt"><i>📈</i><span>Measurements are viewed one by one, not as patterns across factors</span></div>
+<div class="pt"><i>💡</i><span>Needed: predict risk, explain contributors, explore changes in modifiable factors</span></div>
+</div>
+<svg class="vis2" id="v2" width="580" height="440" viewBox="0 0 580 440"></svg>
+<div class="hl"><span>Prediction</span><b>→</b><span>Understanding</span><b>→</b><span>Actionable Insight</span></div>
+</section>
+
+<section class="slide s3">
+<svg class="ecg" viewBox="0 0 1280 120" style="top:300px;opacity:.1"></svg>
+<svg class="bgheart" viewBox="0 0 100 100" data-op=".22" style="left:315px;top:50px"></svg>
+<div class="rel"><h2>How CardioInsight Works</h2><div class="tag">A continuous data-analysis pipeline</div></div>
+<svg class="diag" id="d3" viewBox="0 0 1280 720"></svg>
+<div class="fin">Predict → Explain → Simulate → Understand</div>
+</section>
+
+<section class="slide s4">
+<div class="rel s4h"><h2>CardioInsight Prototype</h2><span>Educational research prototype • Risk estimation, not diagnosis</span></div>
+<div class="dash">
+<div class="bar"><svg width="22" height="22" viewBox="0 0 100 100"><path d="M50 88C20 65 8 48 8 32 8 18 19 10 30 10 39 10 46 15 50 22 54 15 61 10 70 10 81 10 92 18 92 32 92 48 80 65 50 88Z" fill="#19a999"/></svg>CardioInsight — Risk Explorer<em>Sample values</em></div>
+<div class="grid">
+<div class="card"><h4>Patient Profile</h4>
+<div class="pf"><span>Age</span><b>54 yrs</b></div>
+<div class="pf"><span>Blood Pressure</span><b>148/92 mmHg</b></div>
+<div class="pf"><span>Cholesterol</span><b>238 mg/dL</b></div>
+<div class="pf"><span>BMI</span><b>29.4</b></div>
+<div class="pf"><span>Fasting Glucose</span><b>118 mg/dL</b></div>
+<div class="pf"><span>Smoking</span><b class="rk">Current</b></div>
+<div class="pf"><span>Physical Activity</span><b class="rk">Low</b></div>
+</div>
+<div class="card ctr"><h4>Risk Assessment</h4>
+<svg width="300" height="167" viewBox="30 18 260 145"><path d="M40 150A120 120 0 0 1 75.15 65.15" stroke="#3fb5a3" stroke-width="20" fill="none"/><path d="M75.15 65.15A120 120 0 0 1 160 30" stroke="#5b9be6" stroke-width="20" fill="none"/><path d="M160 30A120 120 0 0 1 244.85 65.15" stroke="#f19a6b" stroke-width="20" fill="none"/><path d="M244.85 65.15A120 120 0 0 1 280 150" stroke="#d9644a" stroke-width="20" fill="none"/><g stroke="#fff" stroke-width="3"><line x1="83.6" y1="73.6" x2="66.7" y2="56.7"/><line x1="160" y1="42" x2="160" y2="18"/><line x1="236.4" y1="73.6" x2="253.3" y2="56.7"/></g><circle cx="204.2" cy="38.4" r="9" fill="#0f2a55" stroke="#fff" stroke-width="3"/><text x="160" y="104" font-size="14" fill="#4a638f" text-anchor="middle">Cardiovascular Risk</text><text x="160" y="140" font-size="34" font-weight="800" fill="#c8553a" text-anchor="middle" letter-spacing="1">ELEVATED</text></svg>
+<div class="est">Estimated Risk: <b>62 / 100</b></div>
+<div class="lg"><span><i style="background:#3fb5a3"></i>Low</span><span><i style="background:#5b9be6"></i>Moderate</span><span><i style="background:#f19a6b"></i>Elevated</span><span><i style="background:#d9644a"></i>High</span></div>
+<div class="rf"><h5>Key Risk Factors</h5>
+<div class="ib"><span>Blood Pressure</span><div class="tr"><u style="width:84%;background:#f19a6b"></u></div><b style="color:#c8553a">High contribution</b></div>
+<div class="ib"><span>Cholesterol</span><div class="tr"><u style="width:58%;background:#5b9be6"></u></div><b style="color:#2f6fc4">Moderate</b></div>
+<div class="ib"><span>BMI</span><div class="tr"><u style="width:46%;background:#5b9be6"></u></div><b style="color:#2f6fc4">Moderate</b></div>
+<div class="ib"><span>Smoking</span><div class="tr"><u style="width:28%;background:#3fb5a3"></u></div><b style="color:#1e8f80">Lower</b></div>
+</div></div>
+<div class="card"><h4>What-If Analysis</h4>
+<div class="sl"><div>Blood Pressure<b>148 → <span id="lb">128</span></b></div><input type="range" id="bp" min="110" max="170" value="128"></div>
+<div class="sl"><div>Cholesterol<b>238 → <span id="lc">200</span></b></div><input type="range" id="ch" min="150" max="280" value="200"></div>
+<div class="sl"><div>BMI<b>29.4 → <span id="lm">26.0</span></b></div><input type="range" id="bm" min="20" max="35" step=".1" value="26"></div>
+<div class="cmp"><small>CURRENT PROFILE</small><div class="v"><strong style="color:#c8553a">62</strong><span style="color:#c8553a">Elevated</span></div></div>
+<div class="dn">↓</div>
+<div class="cmp" id="mod"><small>MODIFIED PROFILE</small><div class="v"><strong id="nr">43</strong><span id="nc">Moderate</span></div></div>
+<div class="note">Illustrative model scenario</div>
+</div>
+</div></div>
+<div class="fin4">Predict <b>→</b> Explain <b>→</b> Simulate</div>
+</section>
+</div>
+<div class="nav"><button id="pv" aria-label="Previous slide">‹</button><button id="nx" aria-label="Next slide">›</button></div>
+<script>
+const NS="http://www.w3.org/2000/svg";
+const H="M50 88C20 65 8 48 8 32 8 18 19 10 30 10 39 10 46 15 50 22 54 15 61 10 70 10 81 10 92 18 92 32 92 48 80 65 50 88Z";
+const P=[[30,28],[50,24],[70,28],[20,40],[40,42],[60,42],[80,40],[30,55],[50,55],[70,55],[40,68],[60,68],[50,80],[50,36]];
+document.querySelectorAll(".bgheart").forEach(s=>{
+ let h=`<g opacity="${s.dataset.op}"><path d="${H}" fill="url(#g2)" stroke="url(#g1)" stroke-width=".8"/><path d="${H}" fill="none" stroke="#18e3c8" stroke-width=".3" transform="translate(50 50) scale(1.07) translate(-50 -50)" stroke-dasharray="1.5 2"/>`;
+ P.forEach((a,i)=>P.forEach((b,j)=>{if(j>i&&Math.hypot(a[0]-b[0],a[1]-b[1])<24)h+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#18e3c8" stroke-opacity=".4" stroke-width=".25"/>`}));
+ P.forEach(a=>h+=`<circle cx="${a[0]}" cy="${a[1]}" r="1.1" fill="#7ff3e4"/>`);
+ s.innerHTML=h+`<polyline points="10,52 30,52 36,52 40,46 44,58 49,30 54,70 58,52 90,52" fill="none" stroke="#fff" stroke-width=".7" stroke-linejoin="round"/></g>`});
+document.querySelectorAll(".ecg").forEach(s=>{let d="M0 60";for(let i=0;i<4;i++)d+="h110 l15 -14 l15 14 h60 l12 14 l18 -80 l18 100 l12 -34 h60";
+ s.innerHTML=`<path d="${d}" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linejoin="round"/>`});
+/* slide 2 visual */
+(function(){const s=document.getElementById("v2"),f=["Age","Blood pressure","Cholesterol","Diabetes","Obesity","Smoking","Inactivity"];let h="";
+ f.forEach((t,i)=>{const y=30+i*60;h+=`<path d="M135 ${y} C215 ${y} 215 220 285 220" fill="none" stroke="#18e3c8" stroke-opacity=".45" stroke-width="1.6"/><rect x="10" y="${y-18}" width="125" height="36" rx="18" fill="rgba(16,38,82,.85)" stroke="rgba(120,190,255,.35)"/><text x="72" y="${y+5}" fill="#cfe6ff" font-size="14" text-anchor="middle">${t}</text>`});
+ h+=`<circle cx="320" cy="220" r="52" fill="url(#g3)" stroke="#3b82ff" stroke-width="2" stroke-dasharray="4 5"/><path d="M296 214c10-22 22 22 32 0s16 14 24-4" fill="none" stroke="#ffb454" stroke-width="3" stroke-linecap="round"/><text x="320" y="246" fill="#ffb454" font-size="26" text-anchor="middle" font-weight="700">?</text>
+ <text x="320" y="296" fill="#8ea6c9" font-size="13" text-anchor="middle">complex pattern</text>
+ <path d="M375 220H430" stroke="#18e3c8" stroke-width="2" marker-end="url(#ar)"/>
+ <g transform="translate(430 150) scale(1.35)"><path d="${H}" fill="url(#g2)" stroke="url(#g1)" stroke-width="1.2"/><text x="50" y="52" fill="#fff" font-size="12" text-anchor="middle" font-weight="700">Risk?</text></g>
+ <text x="498" y="300" fill="#8ea6c9" font-size="13" text-anchor="middle">hard to interpret</text>
+ <rect x="150" y="372" width="330" height="40" rx="20" fill="rgba(24,227,200,.12)" stroke="#18e3c8"/><text x="315" y="398" fill="#7ff3e4" font-size="15" text-anchor="middle">Need for better insight</text>`;
+ s.innerHTML=h})();
+/* slide 3 diagram */
+(function(){const s=document.getElementById("d3"),L=["Patient Health Data","Data Preprocessing","Pattern & Feature Analysis","ML Risk Prediction","Risk Explanation","What-If Simulation","Personalized Insight"],I=["👤","🧹","📊","🧠","🔍","🎚️","💡"],cx=640,cy=378,R=195,r=40,N=7,rad=Math.PI/180,pt=(a,k=R)=>[cx+k*Math.cos(a*rad),cy+k*Math.sin(a*rad)];
+ let h=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(120,190,255,.12)" stroke-dasharray="3 7"/>`;
+ const off=(r+12)/R/rad,A=i=>-90+i*360/N;
+ for(let i=0;i<N;i++){const a=A(i)+off,b=A(i+1)-off,[x1,y1]=pt(a),[x2,y2]=pt(b);h+=`<path d="M${x1} ${y1}A${R} ${R} 0 0 1 ${x2} ${y2}" fill="none" stroke="#18e3c8" stroke-width="2.5" marker-end="url(#ar)"${i==N-1?' stroke-dasharray="6 5"':''}/>`}
+ for(let i=0;i<N;i++){const a=A(i),[x,y]=pt(a),c=Math.cos(a*rad);
+  h+=`<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g3)" stroke="url(#g1)" stroke-width="3"/><text x="${x}" y="${y+10}" font-size="28" text-anchor="middle">${I[i]}</text><circle cx="${x-30}" cy="${y-30}" r="12" fill="#18e3c8"/><text x="${x-30}" y="${y-25}" font-size="14" font-weight="800" fill="#04122b" text-anchor="middle">${i+1}</text>`;
+  let tx=x,ty=y,an="middle";if(i==0)ty=y-r-14;else if(c>0){tx=x+r+14;an="start";ty=y+6}else{tx=x-r-14;an="end";ty=y+6}
+  h+=`<text x="${tx}" y="${ty}" fill="#eaf4ff" font-size="18" font-weight="600" text-anchor="${an}">${L[i]}</text>`}
+ h+=`<circle cx="${cx}" cy="${cy}" r="100" fill="url(#g3)" stroke="url(#g1)" stroke-width="3"/><g transform="translate(${cx-32} ${cy-84}) scale(.64)"><path d="${H}" fill="url(#g2)" stroke="url(#g1)" stroke-width="3"/></g><path d="M${cx-60} ${cy-18}h30l8-10 12 28 10-18h40" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" transform="translate(0 6)"/><text x="${cx}" y="${cy+50}" fill="#fff" font-size="19" font-weight="800" text-anchor="middle" letter-spacing="1">CARDIOINSIGHT</text><text x="${cx}" y="${cy+72}" fill="#8ea6c9" font-size="12" text-anchor="middle">risk estimation engine</text>`;
+ s.innerHTML=h})();
+/* what-if */
+(function(){const g=i=>document.getElementById(i),bp=g("bp"),ch=g("ch"),bm=g("bm"),Z={Lower:["#1e8f80","#e1f5f2","#a7ddd5"],Moderate:["#2f6fc4","#e4eefc","#b4cdf0"],Elevated:["#c8553a","#fdece4","#f3c3ac"]};
+ function u(){let r=62+.5*(bp.value-148)+.12*(ch.value-238)+1.2*(bm.value-29.4);r=Math.round(Math.max(8,Math.min(95,r)));
+  g("lb").textContent=bp.value;g("lc").textContent=ch.value;g("lm").textContent=(+bm.value).toFixed(1);
+  const k=r<30?"Lower":r<50?"Moderate":"Elevated",c=Z[k];
+  g("nr").textContent=r;g("nc").textContent=k;g("mod").style.cssText=`background:${c[1]};border-color:${c[2]}`;g("nr").style.color=g("nc").style.color=c[0]}
+ [bp,ch,bm].forEach(e=>e.oninput=u);u()})();
+/* navigation + scaling */
+const sl=[...document.querySelectorAll(".slide")],st=document.getElementById("stage");let n=0;
+function go(i){n=Math.max(0,Math.min(sl.length-1,i));sl.forEach((e,k)=>e.classList.toggle("on",k==n))}
+function fit(){const k=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`translate(-50%,-50%) scale(${k})`}
+addEventListener("resize",fit);fit();
+addEventListener("keydown",e=>{if(["ArrowRight","PageDown"," "].includes(e.key))go(n+1);if(["ArrowLeft","PageUp"].includes(e.key))go(n-1)});
+document.getElementById("nx").onclick=()=>go(n+1);document.getElementById("pv").onclick=()=>go(n-1);
+let tx=0;addEventListener("touchstart",e=>tx=e.touches[0].clientX);addEventListener("touchend",e=>{const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>60)go(n+(d<0?1:-1))});
+</script></body></html>
